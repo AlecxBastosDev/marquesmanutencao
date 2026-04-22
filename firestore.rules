@@ -1,0 +1,82 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: orders
+    // Fields:
+    //   - items: list (required) - List of products
+    //   - customer: map (required) - {name, email, phone, address, city, state, zip}
+    //   - total: number (required) - Total value
+    //   - paymentMethod: string (required) - 'credit' | 'pix' | 'boleto'
+    //   - status: string (required) - 'pending' | 'paid' | 'cancelled'
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: products
+    // Fields:
+    //   - name: string (required)
+    //   - price: number (required)
+    //   - image: string (required)
+    //   - category: string (required)
+    //   - description: string
+    //   - specifications: list
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "Alecxbastos@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidOrder(data) {
+      return data.items is list &&
+             data.customer is map &&
+             data.customer.name is string && data.customer.name.size() > 0 && data.customer.name.size() < 100 &&
+             data.customer.email is string && data.customer.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             data.total is number && data.total >= 0 &&
+             data.paymentMethod in ['credit', 'pix', 'boleto'] &&
+             data.status in ['pending', 'paid', 'cancelled'] &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.price is number && data.price >= 0 &&
+             data.image is string && data.category is string;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    // Orders: Anyone can create (checkout), but only admins can read/list/update
+    match /orders/{orderId} {
+      allow create: if isValidOrder(request.resource.data);
+      allow read, list, update, delete: if isAdmin();
+    }
+
+    // Products: Anyone can read, only admins can write
+    match /products/{productId} {
+      allow read, list: if true;
+      allow write: if isAdmin();
+    }
+
+    // Users: Private data, only owner or admin can read/write
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "marques-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "dev": "tsx api/index.ts",
+    "build": "vite build",
+    "start": "NODE_ENV=production tsx api/index.ts",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.48.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "dotenv": "^17.4.0",
+    "express": "^5.2.1",
+    "firebase": "^12.11.0",
+    "framer-motion": "^12.38.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.563.0",
+    "motion": "^12.38.0",
+    "qrcode.react": "^4.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "stripe": "^22.0.0",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
+    "vite": "^6.2.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "A customer order containing items, customer info, and payment status.",
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "description": "List of products purchased."
+        },
+        "customer": {
+          "type": "object",
+          "description": "Customer contact and shipping information."
+        },
+        "total": {
+          "type": "number",
+          "description": "Total order value."
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["credit", "pix", "boleto"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "paid", "cancelled"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["items", "customer", "total", "paymentMethod", "status", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Product details for the catalog.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "image": { "type": "string" },
+        "category": { "type": "string" },
+        "specifications": { "type": "array" }
+      },
+      "required": ["name", "price", "image", "category"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of customer orders."
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of products for the catalog."
+    }
+  }
+}
